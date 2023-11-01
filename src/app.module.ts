@@ -1,9 +1,21 @@
+import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import { AppController } from '@src/app.controller';
+import { AppService } from '@src/app.service';
+
+import { RedisConfigService } from '@src/config/redis/redis.config';
 
 @Module({
-  imports: [],
+  imports: [
+    ConfigModule.forRoot(),
+    RedisModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useClass: RedisConfigService,
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
