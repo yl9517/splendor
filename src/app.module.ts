@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AppController } from '@src/app.controller';
+import { AppService } from '@src/app.service';
+import { RedisCacheModule } from '@config/redis/redis.module';
 
 @Module({
-  imports: [],
+  imports: [RedisCacheModule],
   controllers: [AppController],
   providers: [AppService],
 })
