@@ -1,14 +1,10 @@
-import { RedisService } from '@liaoliaots/nestjs-redis';
-import { Injectable } from '@nestjs/common';
-import Redis from 'ioredis';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class RedisCacheService {
-  private readonly redis: Redis;
-
-  constructor(private readonly redisService: RedisService) {
-    this.redis = this.redisService.getClient();
-  }
+  constructor(@Inject(CACHE_MANAGER) private redis: Cache) {}
 
   async get(key: string): Promise<string> {
     return await this.redis.get(key);
@@ -19,11 +15,10 @@ export class RedisCacheService {
    *
    * @param key 레디스에 저장할 키
    * @param value 레디스에 저장할 값
-   * @param expire 유효기간 - 초 단위
    * @returns 완료 후 'OK'를 반환
    */
-  async set(key: string, value: any, expire = 3600): Promise<'OK'> {
-    return await this.redis.set(key, value, 'EX', expire);
+  async set(key: string, value: any, option?: any): Promise<'OK'> {
+    return await this.redis.set(key, value, option);
   }
 
   async reset() {

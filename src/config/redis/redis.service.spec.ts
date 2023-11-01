@@ -1,22 +1,23 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { RedisCacheService } from './redis.service';
-import { RedisConfigService } from './redis.config';
+import { redisStore } from 'cache-manager-redis-store';
+import { CacheModule } from '@nestjs/cache-manager';
 
 describe('RedisService', () => {
   let service: RedisCacheService;
 
   beforeEach(async () => {
+    const cacheModule = CacheModule.register({
+      useFactory: async () => ({
+        isGlobal: true,
+        store: redisStore,
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT,
+        ttl: 10000, // 캐시 유지 시간
+      }),
+    });
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot(),
-        RedisModule.forRootAsync({
-          imports: [ConfigModule],
-          inject: [ConfigService],
-          useClass: RedisConfigService,
-        }),
-      ],
+      imports: [cacheModule],
       providers: [RedisCacheService],
     }).compile();
 
